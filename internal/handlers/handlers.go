@@ -21,7 +21,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, fileHeader, err := r.FormFile("file")
+	file, fileHeader, err := r.FormFile("myFile")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -41,7 +41,16 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fileName := time.Now().UTC().Format("20060102150405") + filepath.Ext(fileHeader.Filename)
-	_ = os.WriteFile(fileName, []byte(result), 0644)
 
-	_, _ = w.Write([]byte(result))
+	err = os.WriteFile(fileName, []byte(result), 0644)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = w.Write([]byte(result))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
